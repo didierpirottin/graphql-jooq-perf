@@ -1,2 +1,2 @@
-# graphql-jooq-perf
-Demo Spring for GraphQL with JooQ to access Database and performance optimisations
+= Demo Spring for GraphQL - JooQ - Performance Optimisations
+
