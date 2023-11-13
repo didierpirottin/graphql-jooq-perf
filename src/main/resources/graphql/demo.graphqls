@@ -1,0 +1,42 @@
+type Query {
+    demo: String
+    customers(filter: CustomerPredicate): [Customer]
+}
+
+input CustomerPredicate {
+    firstName: StringPredicate
+    lastName: StringPredicate
+}
+
+input StringPredicate {
+    is: String
+    isNot: String
+    contains: String
+    startsWith: String
+    endsWith: String
+    isOneOf: [String]
+}
+
+type Customer {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    address: Address
+    accounts: [Account]!
+    greeting: String!
+}
+
+type Account {
+    id: ID!
+    iban: String!
+    balance: Float!
+    currency: String!
+}
+
+type Address {
+    streetNumber: String!
+    streetName: String!
+    zipCode: String!
+    city: String!
+    country: String!
+}
