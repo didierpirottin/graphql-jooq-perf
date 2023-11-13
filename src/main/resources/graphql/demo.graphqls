@@ -6,7 +6,18 @@ type Query {
 input CustomerPredicate {
     firstName: StringPredicate
     lastName: StringPredicate
+    address: AddressPredicate
 }
+
+input AddressPredicate {
+    streetNumber: StringPredicate
+    streetName: StringPredicate
+    zipCode: StringPredicate
+    city: StringPredicate
+    country: StringPredicate
+}
+
+
 
 input StringPredicate {
     is: String
