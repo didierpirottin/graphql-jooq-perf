@@ -5,7 +5,6 @@ import graphql.demo.model.CustomerModel;
 import graphql.demo.model.CustomerPredicate;
 import graphql.schema.DataFetchingFieldSelectionSet;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectJoinStep;
@@ -22,15 +21,53 @@ import static org.jooq.impl.DSL.multiset;
 @Controller
 @RequiredArgsConstructor
 public class CustomerController {
-    public static final String ADDRESS_ATTRIBUTE = "address";
     private final DSLContext dslContext;
 
     @QueryMapping
     List<CustomerModel> customers(@Argument CustomerPredicate filter, DataFetchingFieldSelectionSet selectionSet) {
-        SelectSelectStep<Record> select = dslContext.select(CUSTOMERS.asterisk());
-        if (selectionSet.contains("address")) {
-            select.select(ADDRESSES.asterisk());
+        SelectSelectStep<Record> select = selectStep(selectionSet);
+        SelectJoinStep<Record> query = getRecordSelectJoinStep(filter, selectionSet, select);
+        whereStep(filter, query);
+        return executeAndMap(query);
+    }
+
+    private static List<CustomerModel> executeAndMap(SelectJoinStep<Record> query) {
+        return query
+                .fetch()
+                .stream()
+                .map(CustomerModelMapper::mapCustomerRecordToModel)
+                .toList();
+    }
+
+    private static void whereStep(CustomerPredicate filter, SelectJoinStep<Record> query) {
+        if (filter != null) {
+            filter.applyOn(query);
         }
+    }
+
+
+    private static SelectJoinStep<Record> getRecordSelectJoinStep(CustomerPredicate filter, DataFetchingFieldSelectionSet selectionSet, SelectSelectStep<Record> select) {
+        SelectJoinStep<Record> query = select.from(CUSTOMERS);
+        joinAddresses(filter, selectionSet, query);
+        return query;
+    }
+
+    private static void joinAddresses(CustomerPredicate filter, DataFetchingFieldSelectionSet selectionSet, SelectJoinStep<Record> query) {
+        if (selectionSet.contains("address") ||
+                (filter != null && filter.address() != null)) {
+            query.leftJoin(ADDRESSES).on(ADDRESSES.ID.eq(CUSTOMERS.ADDRESS_ID));
+        }
+    }
+
+
+    private SelectSelectStep<Record> selectStep(DataFetchingFieldSelectionSet selectionSet) {
+        SelectSelectStep<Record> select = selectCustomers(selectionSet);
+        selectAddresses(selectionSet, select);
+        selectAccounts(selectionSet, select);
+        return select;
+    }
+
+    private void selectAccounts(DataFetchingFieldSelectionSet selectionSet, SelectSelectStep<Record> select) {
         if (selectionSet.contains("accounts")) {
             select.select(
                     multiset(
@@ -39,20 +76,27 @@ public class CustomerController {
                                     .where(ACCOUNTS.CUSTOMER_ID.eq(CUSTOMERS.ID)))
                             .as("Accounts_Multiset"));
         }
-
-        @NotNull SelectJoinStep<Record> query = select
-                .from(CUSTOMERS);
-        if (selectionSet.contains(ADDRESS_ATTRIBUTE)) {
-            query.leftJoin(ADDRESSES).on(ADDRESSES.ID.eq(CUSTOMERS.ADDRESS_ID));
-        }
-
-        if (filter != null) {
-            filter.applyOn(query);
-        }
-        return query
-                .fetch()
-                .stream()
-                .map(CustomerModelMapper::mapCustomerRecordToModel)
-                .toList();
     }
+
+    private static void selectAddresses(DataFetchingFieldSelectionSet selectionSet, SelectSelectStep<Record> select) {
+        if (selectionSet.contains("address")) {
+            select.select(ADDRESSES.asterisk());
+        }
+    }
+
+
+    private SelectSelectStep<Record> selectCustomers(DataFetchingFieldSelectionSet selectionSet) {
+        SelectSelectStep<Record> select = dslContext.select();
+        if (selectionSet.contains("id")) {
+            select = select.select(CUSTOMERS.ID);
+        }
+        if (selectionSet.contains("firstName")) {
+            select = select.select(CUSTOMERS.FIRST_NAME);
+        }
+        if (selectionSet.contains("lastName")) {
+            select = select.select(CUSTOMERS.LAST_NAME);
+        }
+        return select;
+    }
+
 }
