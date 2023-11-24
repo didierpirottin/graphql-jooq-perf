@@ -195,7 +195,10 @@ SECTION .title {
   -webkit-filter: drop-shadow(0px 0px 30px rgba(255,255,255,1));
   filter: drop-shadow(0px 0px 30px rgba(255,255,255,1));
 }
-
+.reveal section div.plain span img {
+    border: 0;
+    box-shadow: none;
+}
 /* Inline code */
 .reveal code {
   border-radius: 5px;
