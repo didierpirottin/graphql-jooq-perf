@@ -4,5 +4,4 @@ This project is a demo on how to implement a link:https://graphql.org/[GraphQL] 
 
 The main objective is to highlight some important attention points in the implementation, more specifically related to *potential performance issues*, and to address them.
 
-Please see the https://htmlpreview.github.io/?https://github.com/didierpirottin/graphql-jooq-perf/blob/main/doc/doc-site/GraphQlDemo/latest/guide/detailed-guide.html[detailed guide] for more details (also available as a link:https://raw.githubusercontent.com/didierpirottin/graphql-jooq-perf/main/doc/detailed-guide.pdf
-[PDF document]).
+Please see the https://htmlpreview.github.io/?https://github.com/didierpirottin/graphql-jooq-perf/blob/main/doc/doc-site/GraphQlDemo/latest/guide/detailed-guide.html[detailed guide] for more details (also available as a https://raw.githubusercontent.com/didierpirottin/graphql-jooq-perf/main/doc/detailed-guide.pdf[PDF document]).
